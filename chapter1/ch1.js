@@ -75,21 +75,19 @@ function statement(invoice, plays) {
         return volumeCredits;
     }
     function totalAmount(data) {
-        let result = 0;
-        for (let perf of data.performances) {
-            //포인트를 적립한다
-            result += perf.amount
-        }
-        return result;
+        // for (let perf of data.performances) {
+        //     //포인트를 적립한다
+        //     result += perf.amount
+        // }
+        return data.performances.reduce((total,p)=>total+p.amount,0)
     }
 
     function totalVolumeCredits(data) {
-        let result = 0;
-        for (let perf of data.performances) {
-            //포인트를 적립한다
-            result += perf.volumeCredits
-        }
-        return result;
+        // for (let perf of data.performances) {
+        //     //포인트를 적립한다
+        //     result += perf.volumeCredits
+        // }
+        return data.performances.reduce((total,p)=>total+p.volumeCredits,0)
     }
 }
 
