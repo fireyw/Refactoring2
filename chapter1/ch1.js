@@ -23,12 +23,14 @@ const invoices =
             },
         ]
     }
-class PerformanceCalculator{
+
+class PerformanceCalculator {
     constructor(aPerformance, aPlay) {
         this.performance = aPerformance;
         this.play = aPlay;
     }
-    get amount(){
+
+    get amount() {
         let result = 0; //변수 초기화
         switch (this.play.type) {
             case "tragedy": //비극
@@ -49,7 +51,8 @@ class PerformanceCalculator{
         }
         return result;
     }
-    get volumeCredits(){
+
+    get volumeCredits() {
         let volumeCredits = 0;
         volumeCredits += Math.max(this.performance.audience - 30, 0);
         //희극 관객 5명마다 추가 포인트를 제공한다
@@ -58,11 +61,21 @@ class PerformanceCalculator{
     }
 }
 
+class TragedyCalculator extends PerformanceCalculator{
 
+}
+
+class ComedyCalculator extends PerformanceCalculator{
+
+}
+
+function createPerformanceCalculator(aPerformance, aPlay){
+    return new PerformanceCalculator(aPerformance, aPlay);
+}
 
 console.log(statement(invoices, plays));
-// console.log(htmlStatement(invoices, plays));
 
+// console.log(htmlStatement(invoices, plays));
 
 
 function usd(aNumber) {
@@ -76,10 +89,12 @@ function usd(aNumber) {
 function statement(invoice, plays) {
     return renderPlainText(createStatementData(invoice, plays));
 }
+
 function htmlStatement(invoice, plays) {
     return renderHtml(createStatementData(invoice, plays))
 }
-function renderHtml (data) {
+
+function renderHtml(data) {
     let result = `<h1>Statement for ${data.customer}</h1>\n`;
     result += "<table>\n";
     result += "<tr><th>play</th><th>seats</th><th>cost</th></tr>";
@@ -93,31 +108,33 @@ function renderHtml (data) {
     return result;
 }
 
-function createStatementData(invoice, plays){
+function createStatementData(invoice, plays) {
 
     const statementData = {};
-    statementData.customer=invoice.customer;
-    statementData.performances=invoice.performances.map(enrichPerformance);
-    statementData.totalAmount= totalAmount(statementData);
-    statementData.totalVolumeCredits=totalVolumeCredits(statementData)
+    statementData.customer = invoice.customer;
+    statementData.performances = invoice.performances.map(enrichPerformance);
+    statementData.totalAmount = totalAmount(statementData);
+    statementData.totalVolumeCredits = totalVolumeCredits(statementData)
     // return renderPlainText(statementData, invoice, plays);
     return statementData;
 
-    function enrichPerformance(aPerformance){
-        const calculator = new PerformanceCalculator(aPerformance, playFor(aPerformance)); //공연료 계산기 생성
+    function enrichPerformance(aPerformance) {
+        const calculator = createPerformanceCalculator(aPerformance, playFor(aPerformance)); //공연료 계산기 생성
         const result = Object.assign({}, aPerformance); //얕은복사
         result.play = calculator.play;
-        result.amount= calculator.amount;
-        result.volumeCredits= calculator.volumeCredits;
+        result.amount = calculator.amount;
+        result.volumeCredits = calculator.volumeCredits;
         return result;
     }
 
     function playFor(aPerformance) {
         return plays[aPerformance.playID];
     }
+
     function amountFor(aPerformance) { //값이 바뀌지 않는 매개 변수 전달
         return new PerformanceCalculator(aPerformance, playFor(aPerformance)).amount;
     }
+
     function volumeCreditsFor(aPerformance) {
         let volumeCredits = 0;
         volumeCredits += Math.max(aPerformance.audience - 30, 0);
@@ -125,12 +142,13 @@ function createStatementData(invoice, plays){
         if ('comedy' === aPerformance.play.type) volumeCredits += Math.floor(aPerformance.audience / 5);
         return volumeCredits;
     }
+
     function totalAmount(data) {
         // for (let perf of data.performances) {
         //     //포인트를 적립한다
         //     result += perf.amount
         // }
-        return data.performances.reduce((total,p)=>total+p.amount,0)
+        return data.performances.reduce((total, p) => total + p.amount, 0)
     }
 
     function totalVolumeCredits(data) {
@@ -138,7 +156,7 @@ function createStatementData(invoice, plays){
         //     //포인트를 적립한다
         //     result += perf.volumeCredits
         // }
-        return data.performances.reduce((total,p)=>total+p.volumeCredits,0)
+        return data.performances.reduce((total, p) => total + p.volumeCredits, 0)
     }
 }
 
