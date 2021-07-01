@@ -23,9 +23,48 @@ const invoices =
             },
         ]
     }
+class PerformanceCalculator{
+    constructor(aPerformance, aPlay) {
+        this.performance = aPerformance;
+        this.play = aPlay;
+    }
+    get amount(){
+        let result = 0; //변수 초기화
+        switch (this.play.type) {
+            case "tragedy": //비극
+                result = 40000;
+                if (this.performance.audience > 30) {
+                    result += 1000 * (this.performance.audience - 30)
+                }
+                break;
+            case "comedy":
+                result = 30000;
+                if (this.performance.audience > 20) {
+                    result += 10000 + 500 * (this.performance.audience - 20)
+                }
+                result += 300 * this.performance.audience;
+                break;
+            default:
+                throw new Error(`알 수 없는 장르: ${this.performance.play.type}`);
+        }
+        return result;
+    }
+    get volumeCredits(){
+        let volumeCredits = 0;
+        volumeCredits += Math.max(this.performance.audience - 30, 0);
+        //희극 관객 5명마다 추가 포인트를 제공한다
+        if ('comedy' === this.play.type) volumeCredits += Math.floor(this.performance.audience / 5);
+        return volumeCredits;
+    }
+}
 
-// console.log(statement(invoices, plays));
-console.log(htmlStatement(invoices, plays));
+
+
+console.log(statement(invoices, plays));
+// console.log(htmlStatement(invoices, plays));
+
+
+
 function usd(aNumber) {
     return new Intl.NumberFormat("en-US", {
         style: "currency",
@@ -35,7 +74,7 @@ function usd(aNumber) {
 }
 
 function statement(invoice, plays) {
-    return createStatementData(invoice, plays)
+    return renderPlainText(createStatementData(invoice, plays));
 }
 function htmlStatement(invoice, plays) {
     return renderHtml(createStatementData(invoice, plays))
@@ -65,10 +104,11 @@ function createStatementData(invoice, plays){
     return statementData;
 
     function enrichPerformance(aPerformance){
+        const calculator = new PerformanceCalculator(aPerformance, playFor(aPerformance)); //공연료 계산기 생성
         const result = Object.assign({}, aPerformance); //얕은복사
-        result.play = playFor(result);
-        result.amount= amountFor(result);
-        result.volumeCredits= volumeCreditsFor(result);
+        result.play = calculator.play;
+        result.amount= calculator.amount;
+        result.volumeCredits= calculator.volumeCredits;
         return result;
     }
 
@@ -76,26 +116,7 @@ function createStatementData(invoice, plays){
         return plays[aPerformance.playID];
     }
     function amountFor(aPerformance) { //값이 바뀌지 않는 매개 변수 전달
-
-        let result = 0; //변수 초기화
-        switch (aPerformance.play.type) {
-            case "tragedy": //비극
-                result = 40000;
-                if (aPerformance.audience > 30) {
-                    result += 1000 * (aPerformance.audience - 30)
-                }
-                break;
-            case "comedy":
-                result = 30000;
-                if (aPerformance.audience > 20) {
-                    result += 10000 + 500 * (aPerformance.audience - 20)
-                }
-                result += 300 * aPerformance.audience;
-                break;
-            default:
-                throw new Error(`알 수 없는 장르: ${aPerformance.play.type}`);
-        }
-        return result;
+        return new PerformanceCalculator(aPerformance, playFor(aPerformance)).amount;
     }
     function volumeCreditsFor(aPerformance) {
         let volumeCredits = 0;
@@ -119,7 +140,6 @@ function createStatementData(invoice, plays){
         // }
         return data.performances.reduce((total,p)=>total+p.volumeCredits,0)
     }
-
 }
 
 function renderPlainText(data, invoice, plays) {
@@ -141,5 +161,4 @@ function renderPlainText(data, invoice, plays) {
 
     }
 }
-
 
