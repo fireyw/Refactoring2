@@ -26,7 +26,13 @@ const invoices =
 
 console.log(statement(invoices, plays));
 
+
 function statement(invoice, plays) {
+    return createStatementData(invoice, plays)
+}
+
+function createStatementData(invoice, plays){
+
     const statementData = {};
     statementData.customer=invoice.customer;
     statementData.performances=invoice.performances.map(enrichPerformance);
@@ -89,6 +95,7 @@ function statement(invoice, plays) {
         // }
         return data.performances.reduce((total,p)=>total+p.volumeCredits,0)
     }
+
 }
 
 function renderPlainText(data, invoice, plays) {
@@ -96,7 +103,7 @@ function renderPlainText(data, invoice, plays) {
 
     for (let perf of data.performances) {
         //청구 내역을 출시한다
-        result += `${perf.name}: ${usd(perf.amount)} (${perf.audience}석) \n`;
+        result += `${perf.play.name}: ${usd(perf.amount)} (${perf.audience}석) \n`;
     }
     result += `총액: ${usd(data.totalAmount)}\n`;
     result += `적립 포인트: ${data.totalVolumeCredits}점\n`;
