@@ -119,8 +119,8 @@ function createStatementData(invoice, plays) {
     function enrichPerformance(aPerformance) {
         const calculator = createPerformanceCalculator(aPerformance, playFor(aPerformance)); //공연료 계산기 생성
         const result = Object.assign({}, aPerformance); //얕은복사
-        result.play = calculator.play;
-        result.amount = calculator.amount;
+        result.play = calculator.play;  //class play() 함수 호출
+        result.amount = calculator.amount; //class () 함수 호출
         result.volumeCredits = calculator.volumeCredits;
         return result;
     }
