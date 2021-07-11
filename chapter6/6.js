@@ -1,18 +1,17 @@
 import assert from 'assert';
-class Book {
-    _reservation= [];
-    constructor(props) {
-    }
+let spaceship={}
+let defaultOwnerData = {firstName: '마틴', lastName: '파울러'};
 
-    addReservation(customer, isPiority){
-        assert(isPiority === true || isPiority===false); //매개변수 실제로 사용하는지 확인
-        this._reservation.push(customer);
-    }
-    get reservation(){
-        console.log(this._reservation);
-    }
+function defaultOwner() {return Object.assign({},defaultOwnerData);}
+function setDefaultOwner(arg){
+    defaultOwner=arg;
 }
 
-const bookcafe = new Book();
-bookcafe.addReservation({name:'fireyw', age:'38'},false);
-bookcafe.reservation;
+
+const owner1 = defaultOwner();
+assert.equal('파울러',owner1.lastName, '처음값 확인');
+
+const owner2= defaultOwner();
+owner2.lastName='파슨스';
+console.log(owner1);
+assert.equal('파슨스',owner1.lastName, 'own2를 변경한후');

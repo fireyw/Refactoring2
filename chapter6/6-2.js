@@ -1,11 +1,24 @@
 import assert from 'assert';
-let spaceship={}
+
 let defaultOwnerData = {firstName: '마틴', lastName: '파울러'};
 
-function defaultOwner() {return Object.assign({},defaultOwnerData);}
+// function defaultOwner() {return Object.assign({},defaultOwnerData);}
+function defaultOwner() {return new Person(defaultOwnerData)};
+
 function setDefaultOwner(arg){
     defaultOwner=arg;
 }
+
+class Person {
+    constructor(data) {
+        this._lastName= data.lastName;
+        this._firstName= data.firstName;
+    }
+    get lastName(){return this._lastName};
+    get firstName(){return this._firstName};
+}
+
+
 
 
 const owner1 = defaultOwner();
